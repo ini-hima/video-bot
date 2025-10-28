@@ -1,8 +1,8 @@
 """معالج شامل لجميع أزرار البوت مع دعم التصفح وأزرار الإدارة"""
 import logging
-import math
-from datetime import datetime
 from telebot import types
+from config import bot
+from app.database.connection import execute_query
 
 logger = logging.getLogger(__name__)
 
