@@ -2,8 +2,10 @@
 معالجات لوحة تحكم الإدارة المتقدمة
 """
 import logging
-from datetime import datetime
 from telebot import types
+from config import bot
+from app.database.connection import execute_query
+
 
 logger = logging.getLogger(__name__)
 
@@ -381,3 +383,4 @@ def register_admin_handlers(bot):
     bot.callback_query_handler(func=admin_callback_filter)(lambda call: handle_admin_callback(bot, call))
     
     logger.info("✅ تم تسجيل معالجات الإدارة")
+
