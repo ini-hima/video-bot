@@ -1,4 +1,4 @@
-"""معالج شامل لجميع أزرار البوت مع دعم التصفح وأزرار الإدارة"""
+"""معالج شامل لجميع أزرار البوت مع دعم التصفح وأزرار الإدارة (telebot-style)"""
 import logging
 import math
 from datetime import datetime
@@ -29,7 +29,6 @@ def safe_edit(bot, chat_id, message_id, text, markup=None, allow_html=False):
         except Exception as e2:
             logger.error(f"❌ send_message fallback failed: {e2}")
 
-
 def safe_send(bot, chat_id, text, markup=None, allow_html=False):
     try:
         if allow_html:
@@ -38,7 +37,6 @@ def safe_send(bot, chat_id, text, markup=None, allow_html=False):
             bot.send_message(chat_id, text, reply_markup=markup)
     except Exception as e:
         logger.error(f"❌ send_message failed: {e}")
-
 
 def handle_callback_query(bot, call):
     """معالج شامل للأزرار مع دعم التصفح وأزرار الإدارة"""
@@ -50,12 +48,14 @@ def handle_callback_query(bot, call):
         ADMIN_IDS = getattr(settings, "admin_list", [])
 
         if data == "main_menu":
-            from app.handlers.start import start_command
+            # استدعاء وظيفة البداية عبر تسجيلها سابقاً؛ إن أردت يمكنك استدعاء start handler مباشرة
             try:
+                from app.handlers.start import start_command  # قد لا تكون متاحة بهذه الصيغة دائماً
                 bot.delete_message(call.message.chat.id, call.message.message_id)
-            except:
+                start_command(call.message)
+            except Exception:
+                # بدلاً من ذلك أعد إرسال رسالة ثابتة أو استدعِ register_start_handlers عند بدء التطبيق
                 pass
-            start_command(bot, call.message)
 
         elif data == "search":
             handle_search_menu(bot, call)
@@ -116,7 +116,6 @@ def handle_callback_query(bot, call):
                 bot.answer_callback_query(call.id, "❌ غير مصرح لك بهذه العملية")
                 return
 
-            # استدعاء معالج أزرار الإدارة (يجب أن يكون معرّفًا في app/handlers/admin.py)
             from app.handlers.admin import handle_admin_callback
             handle_admin_callback(bot, call)
             return  # عدم استدعاء answer_callback_query مرة أخرى
@@ -135,8 +134,6 @@ def handle_callback_query(bot, call):
         except:
             pass
 
-
-# بقية الدوال (handle_search_menu, handle_categories_menu, ... ) تبقى كما هي مع الاعتماد على bot الممرر
 def register_all_callbacks(bot):
     """تسجيل معالجات الأزرار"""
     bot.callback_query_handler(func=lambda call: True)(lambda call: handle_callback_query(bot, call))
